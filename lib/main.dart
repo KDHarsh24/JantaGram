@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const InstaCloneApp());
+  runApp(const JantaGram());
 }
 
-class InstaCloneApp extends StatelessWidget {
-  const InstaCloneApp({Key? key}) : super(key: key);
+class JantaGram extends StatelessWidget {
+  const JantaGram({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'InstaClone',
+      title: 'JantaGram',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.grey[200],
