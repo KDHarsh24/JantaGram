@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> _posts = [
-  {
+    {
     "location": "Delhi, India",
     "photoUrl": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
     "heading": "#Sunset",
@@ -56,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
   },
 ];
 
-
   String _selectedCity = 'Delhi, India'; // Default city for local feed
 
   final List<String> _cities = [
@@ -74,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Two tabs: Local Feed & Nation
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -83,13 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // ✅ Left buttons (User Profile & Leaderboard)
+              // Left buttons (User Profile & Leaderboard)
               Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.account_circle, color: Colors.black),
                     onPressed: () {
-                      // ✅ Navigate to User Profile
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -101,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.leaderboard, color: Colors.black),
                     onPressed: () {
-                      // Handle leaderboard button
+                      // TODO: Navigate to leaderboard screen
                     },
                   ),
                 ],
@@ -109,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Right logo
               Row(
                 children: const [
-                  Icon(Icons.camera, color: Colors.black), // Logo Icon
+                  Icon(Icons.camera, color: Colors.black),
                   SizedBox(width: 4),
                   Text('JantaGram', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 ],
@@ -119,79 +117,79 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Column(
           children: [
-            // ✅ Tab Bar separated under AppBar
+            // Tab Bar
             Container(
-                color: Colors.white,
-                child: const TabBar(
-                  tabs: [
-                    Tab(text: "Local Feed"),
-                    Tab(text: "Nation"),
-                  ],
-                  labelColor: Colors.blue,
-                  unselectedLabelColor: Colors.black54,
-                  indicatorColor: Colors.blue,
-                  indicatorWeight: 3,
-                ),
+              color: Colors.white,
+              child: const TabBar(
+                tabs: [
+                  Tab(text: "Local Feed"),
+                  Tab(text: "Nation"),
+                ],
+                labelColor: Colors.blue,
+                unselectedLabelColor: Colors.black54,
+                indicatorColor: Colors.blue,
+                indicatorWeight: 3,
               ),
-              // ✅ Tab Content
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    // Local Feed with City Selector
-                    Column(
-                      children: [
-                        Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3), // Shadow position
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.location_on, color: Colors.blue, size: 24),
-                              const SizedBox(width: 8),
-                              const Text('City: ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black87)),
-                            ],
-                          ),
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedCity,
-                              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black87),
-                              dropdownColor: Colors.white,
-                              style: const TextStyle(color: Colors.black87, fontSize: 16),
-                              borderRadius: BorderRadius.circular(12),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedCity = newValue!;
-                                });
-                              },
-                              items: _cities.map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
-                                );
-                              }).toList(),
+            ),
+            // Tab Content
+            Expanded(
+              child: TabBarView(
+                children: [
+                  Column(
+                    children: [
+                      // City Selector
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on, color: Colors.blue, size: 24),
+                                const SizedBox(width: 8),
+                                const Text('City: ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        color: Colors.black87)),
+                              ],
+                            ),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedCity,
+                                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black87),
+                                dropdownColor: Colors.white,
+                                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                                borderRadius: BorderRadius.circular(12),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedCity = newValue!;
+                                  });
+                                },
+                                items: _cities.map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                       // Feed filtered by selected city
                       Expanded(
                         child: FeedList(
@@ -208,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.blue[700],
           onPressed: () {
             Navigator.push(
               context,
@@ -218,11 +217,55 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: const Icon(Icons.add_a_photo),
         ),
+        bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor: Colors.blue[700],
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
+                child: const Icon(Icons.home),
+              ),
+              label: "Home",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: "Search",
+            ),
+            BottomNavigationBarItem(
+              icon: GestureDetector(
+                onTap: () {
+                  // TODO: Navigate to leaderboard screen
+                },
+                child: const Icon(Icons.leaderboard),
+              ),
+              label: "Leaderboard",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.favorite),
+              label: "Likes",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: "Profile",
+            ),
+          ],
+          currentIndex: 0, // Set to 0 since this is the Home screen
+        ),
       ),
     );
   }
 }
 
+// Reusable Feed List Widget
 class FeedList extends StatelessWidget {
   final List<Map<String, dynamic>> posts;
 
