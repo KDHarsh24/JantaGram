@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/user_profile_screen.dart'; // Import User Profile Page
 
 void main() {
   runApp(const JantaGram());
@@ -16,8 +17,14 @@ class JantaGram extends StatelessWidget {
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.grey[200],
       ),
-      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
+
+      // ✅ Define Routes
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/profile': (context) => UserProfileScreen(),
+      },
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/post_card.dart';
 import 'add_post_screen.dart';
+import 'user_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -82,13 +83,19 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left buttons
+              // ✅ Left buttons (User Profile & Leaderboard)
               Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.account_circle, color: Colors.black),
                     onPressed: () {
-                      // Handle account button
+                      // ✅ Navigate to User Profile
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserProfileScreen(),
+                        ),
+                      );
                     },
                   ),
                   IconButton(
