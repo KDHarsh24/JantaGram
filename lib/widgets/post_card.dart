@@ -1,155 +1,403 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 
-class PostCard extends StatefulWidget {
+class PostCardModel {
+  final String id;
   final String location;
   final String photoUrl;
   final String heading;
   final String description;
-  final List<String> authorities; // ✅ Multiple authorities
+  final List<String> authorities;
+  final DateTime timestamp;
+  final int initialLikeCount;
+  final bool isInitiallyLiked;
 
-  const PostCard({
-    Key? key,
+  // ✅ Constructor (without const)
+  PostCardModel({
+    required this.id,
     required this.location,
     required this.photoUrl,
     required this.heading,
     required this.description,
-    this.authorities = const ["Public"], // ✅ Default to "Public" if empty
+    this.authorities = const ["Public"],
+    required this.timestamp, // Removed default value
+    this.initialLikeCount = 0,
+    this.isInitiallyLiked = false,
+  });
+
+  // ✅ Factory constructor for creating an instance with the current timestamp
+  factory PostCardModel.withTimestamp({
+    required String id,
+    required String location,
+    required String photoUrl,
+    required String heading,
+    required String description,
+    List<String> authorities = const ["Public"],
+    int initialLikeCount = 0,
+    bool isInitiallyLiked = false,
+  }) {
+    return PostCardModel(
+      id: id,
+      location: location,
+      photoUrl: photoUrl,
+      heading: heading,
+      description: description,
+      authorities: authorities,
+      timestamp: DateTime.now(), // ✅ Set current time dynamically
+      initialLikeCount: initialLikeCount,
+      isInitiallyLiked: isInitiallyLiked,
+    );
+  }
+
+  // ✅ Factory constructor for API JSON
+  factory PostCardModel.fromJson(Map<String, dynamic> json) {
+    return PostCardModel(
+      id: json['id'] ?? '',
+      location: json['location'] ?? '',
+      photoUrl: json['photoUrl'] ?? '',
+      heading: json['heading'] ?? '',
+      description: json['description'] ?? '',
+      authorities: List<String>.from(json['authorities'] ?? ['Public']),
+      timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
+      initialLikeCount: json['likeCount'] ?? 0,
+      isInitiallyLiked: json['isLikedByUser'] ?? false,
+    );
+  }
+
+  // ✅ Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'location': location,
+      'photoUrl': photoUrl,
+      'heading': heading,
+      'description': description,
+      'authorities': authorities,
+      'timestamp': timestamp.toIso8601String(),
+      'likeCount': initialLikeCount,
+      'isLikedByUser': isInitiallyLiked,
+    };
+  }
+}
+
+class PostCard extends StatefulWidget {
+  final PostCardModel post;
+  final Function(String postId, bool isLiked)? onLikeToggled;
+  final Function(String postId)? onShare;
+  final Function(String postId)? onLocationTap;
+  final Function(String postId)? onTap;
+  final Function(String authority)? onAuthorityTap;
+
+  const PostCard({
+    Key? key,
+    required this.post,
+    this.onLikeToggled,
+    this.onShare,
+    this.onLocationTap,
+    this.onTap,
+    this.onAuthorityTap,
   }) : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
 }
 
-class _PostCardState extends State<PostCard> {
-  bool isLiked = false;
-  int likeCount = 0;
-
-  /// ✅ Load image from file or network
-  Image _loadImage(String url) {
-    return url.startsWith('/')
-        ? Image.file(
-            File(url),
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 220,
-          )
-        : Image.network(
-            url,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 220,
-          );
+class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin {
+  late bool isLiked;
+  late int likeCount;
+  late AnimationController _likeController;
+  
+  @override
+  void initState() {
+    super.initState();
+    isLiked = widget.post.isInitiallyLiked;
+    likeCount = widget.post.initialLikeCount;
+    
+    _likeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
-  /// ✅ Open Google Maps for location
+  @override
+  void dispose() {
+    _likeController.dispose();
+    super.dispose();
+  }
+
+  Widget _loadImage(String url) {
+    if (url.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: 220,
+        color: Colors.grey[300],
+        child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+      );
+    }
+    
+    if (url.startsWith('/')) {
+      return Image.file(
+        File(url),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: 250,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: double.infinity,
+            height: 250,
+            color: Colors.grey[300],
+            child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+          );
+        },
+      );
+    }
+    
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: 250,
+      placeholder: (context, url) => Container(
+        color: Colors.grey[200],
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: Colors.grey[300],
+        child: const Icon(Icons.error, size: 40, color: Colors.grey),
+      ),
+    );
+  }
+
   Future<void> _openMap(String address) async {
-    final query = Uri.encodeComponent(address);
-    final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$query";
+    try {
+      final query = Uri.encodeComponent(address);
+      final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$query";
+      final Uri uri = Uri.parse(googleMapsUrl);
 
-    final Uri uri = Uri.parse(googleMapsUrl);
+      if (widget.onLocationTap != null) {
+        widget.onLocationTap!(widget.post.id);
+        return;
+      }
 
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Could not open Maps for $address';
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw 'Could not open Maps for $address';
+      }
+    } catch (e) {
+      debugPrint('Error opening map: $e');
+    }
+  }
+
+  void _toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+      likeCount += isLiked ? 1 : -1;
+      
+      if (isLiked) {
+        _likeController.forward(from: 0.0);
+      }
+    });
+    
+    // Notify parent about like toggle
+    if (widget.onLikeToggled != null) {
+      widget.onLikeToggled!(widget.post.id, isLiked);
+    }
+  }
+
+  String _getRelativeTime() {
+    final now = DateTime.now();
+    final difference = now.difference(widget.post.timestamp);
+    
+    if (difference.inDays > 7) {
+      return DateFormat('MMM d, y').format(widget.post.timestamp);
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Card(
-      margin: const EdgeInsets.all(12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ✅ Location with clickable map redirection
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.redAccent, size: 20),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _openMap(widget.location),
-                    child: Text(
-                      widget.location,
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 2,
+      shadowColor: Colors.black26,
+      child: InkWell(
+        onTap: widget.onTap != null ? () => widget.onTap!(widget.post.id) : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Timestamp & Menu
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Timestamp
+                  Text(
+                    _getRelativeTime(),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // ✅ Authorities like Instagram tags
-          if (widget.authorities.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                widget.authorities.map((e) => '@$e').join(' '), // Space-separated @tags
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 13,
-                ),
+                  // Menu button
+                  IconButton(
+                    icon: const Icon(Icons.more_horiz),
+                    onPressed: () {},
+                    splashRadius: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  )
+                ],
               ),
             ),
 
-          const SizedBox(height: 8),
-
-          // ✅ Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: _loadImage(widget.photoUrl),
-          ),
-
-          // ✅ Heading, description, like section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Heading
-                Text(
-                  widget.heading,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                // Description
-                Text(
-                  widget.description,
-                  style: const TextStyle(color: Colors.black87),
-                ),
-                const SizedBox(height: 8),
-                // Like button with count
-                Row(
+            // Location with map redirection
+            if (widget.post.location.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Row(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.grey,
+                    Icon(Icons.location_on, color: theme.colorScheme.secondary, size: 18),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _openMap(widget.post.location),
+                        child: Text(
+                          widget.post.location,
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          isLiked = !isLiked;
-                          likeCount += isLiked ? 1 : -1;
-                        });
-                      },
                     ),
-                    Text('$likeCount Likes')
                   ],
                 ),
-              ],
+              ),
+
+            // Authorities like Instagram tags
+            if (widget.post.authorities.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Wrap(
+                  spacing: 4,
+                  children: widget.post.authorities.map(
+                    (authority) => GestureDetector(
+                      onTap: widget.onAuthorityTap != null 
+                          ? () => widget.onAuthorityTap!(authority)
+                          : null,
+                      child: Text(
+                        '@$authority',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary.withOpacity(0.8),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  ).toList(),
+                ),
+              ),
+
+            // Image
+            Hero(
+              tag: 'post_image_${widget.post.id}',
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(0),
+                  bottom: Radius.circular(6),
+                ),
+                child: _loadImage(widget.post.photoUrl),
+              ),
             ),
-          ),
-        ],
+
+            // Heading, description, actions section
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Heading
+                  Text(
+                    widget.post.heading,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  
+                  // Description
+                  Text(
+                    widget.post.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.black87,
+                      height: 1.3,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Action Buttons
+                  Row(
+                    children: [
+                      // Like button animation
+                      ScaleTransition(
+                        scale: Tween<double>(begin: 1.0, end: 1.5).animate(
+                          CurvedAnimation(
+                            parent: _likeController, 
+                            curve: Curves.elasticOut
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            isLiked ? Icons.favorite : Icons.favorite_border,
+                            color: isLiked ? Colors.red : Colors.grey[600],
+                          ),
+                          onPressed: _toggleLike,
+                          splashRadius: 20,
+                        ),
+                      ),
+                      Text(
+                        '$likeCount ${likeCount == 1 ? 'Like' : 'Likes'}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      
+                      const Spacer(),
+                      
+                      // Share button
+                      IconButton(
+                        icon: Icon(Icons.share, color: Colors.grey[600]),
+                        onPressed: widget.onShare != null 
+                            ? () => widget.onShare!(widget.post.id)
+                            : null,
+                        splashRadius: 20,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart'; 
 import '../screens/user_profile_screen.dart'; 
-//import '../screens/leaderboard_screen.dart'; 
+import '../screens/leaderboard_screen.dart'; 
 // TODO: Import other screens if needed
 
 class BottomNavBar extends StatelessWidget {
@@ -32,10 +32,10 @@ class BottomNavBar extends StatelessWidget {
             // TODO: Navigate to Search Screen
             break;
           case 2:
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
-            // );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
+            );
             break;
           case 3:
             // TODO: Navigate to Likes Screen

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/bottom_navbar.dart'; // ✅ Import BottomNavBar
 
 class UserProfileScreen extends StatelessWidget {
-  UserProfileScreen({Key? key}) : super(key: key);
+  UserProfileScreen({super.key});
 
   // Mock User Data
   final String userName = "Chirag Goyal";
