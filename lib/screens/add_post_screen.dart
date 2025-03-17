@@ -43,7 +43,6 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
     );
     _initProcess();
   }
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -55,11 +54,9 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   /// Initial combined process for permissions, location, and image
   Future<void> _initProcess() async {
     setState(() => _isLoading = true);
-    
     await _requestPermissions();
     await _getLocation();
     await _pickImage();
-    
     setState(() => _isLoading = false);
   }
 
@@ -82,7 +79,6 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   /// Pick Image from Camera safely
   Future<void> _pickImage() async {
     final status = await Permission.camera.request();
-
     if (status.isDenied) {
       setState(() => _location = "Camera permission denied.");
       return;
@@ -147,7 +143,7 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
 
       setState(() {
         _resolvedAddress = address;
-        _city = "$city, India"; // Format city properly
+        _city = city; // Format city properly
       });
     } else {
       setState(() {
@@ -189,7 +185,6 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
         "description": _descriptionController.text,
         "authorities": _selectedAuthorities,
         "timestamp": DateTime.now().toIso8601String(),
-        "likeCount": 0,
         "isLikedByUser": false,
       });
       Navigator.pop(context);

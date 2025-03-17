@@ -7,9 +7,13 @@ import 'user_profile_screen.dart';
 import 'leaderboard_screen.dart'; 
 import '../widgets/bottom_navbar.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
+import '../config.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final String email;
+
+  const HomeScreen({Key ? key, required this.email}): super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,9 +25,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   final bool _showElevation = false;
   // Sample posts data converted to PostCardModel format
   List<PostCardModel> _posts = [];
-  String _selectedCity = 'Delhi, India'; // Default city for local feed
+  String _selectedCity = 'Chennai'; // Default city for local feed
   List<String> _cities = [];
-
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -49,6 +53,84 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _scrollController.dispose();
     super.dispose();
   }
+//   Future<void> _fetchFeed() async {
+//   try {
+//     setState(() {
+//       isLoading = true;
+//     });
+
+//     final String url = '${Config.baseUrl}/getemail';
+    
+//     final response = await http.post(
+//       Uri.parse(url),
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Accept": "application/json"
+//       },
+//       body: json.encode({"email": widget.email}),
+//     ).timeout(
+//       const Duration(seconds: 10),
+//       onTimeout: () {
+//         throw TimeoutException('Request timed out');
+//       },
+//     );
+
+//     // Log response
+//     if (response.body.isEmpty) {
+//       throw Exception('Empty response received from server');
+//     }
+
+//     final Map<String, dynamic> responseData = json.decode(response.body);
+
+//     if (!responseData.containsKey('success')) {
+//       throw Exception('Invalid response format: missing success field');
+//     }
+
+//     if (!responseData['success']) {
+//       throw 'Student Not Found';
+//     }
+
+//     if (responseData['data'] == null) {
+//       setState(() {
+//         isLoading = false;
+//         studentData = {};
+//       });
+      
+//       if (!mounted) return;
+      
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('No student data available'),
+//           backgroundColor: Colors.orange,
+//         )
+//       );
+//       return;
+//     }
+
+//     setState(() {
+//       studentData = responseData['data'];
+//       isLoading = false;
+//     });
+//     if (studentData['student'] != null && 
+//         studentData['student']['rollNo'] != null) {
+//       await _fetchAttendanceTimes(studentData['student']['rollNo'].toString());
+//     }
+//     await Future.delayed(const Duration(seconds: 1));
+//   } catch (e) {
+//     setState(() {
+//       isLoading = false;
+//     });
+    
+//     if (!mounted) return;
+    
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text('Error: ${e.toString()}'),
+//         backgroundColor: Colors.red,
+//       )
+//     );
+//   }
+// }
   Future<List<PostCardModel>> loadFromJson(String fileName) async {
     try {
       // Load the JSON file

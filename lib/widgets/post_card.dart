@@ -100,16 +100,17 @@ class PostCard extends StatefulWidget {
   final Function(String postId)? onLocationTap;
   final Function(String postId)? onTap;
   final Function(String authority)? onAuthorityTap;
-
+  final Function(String authority)? doubleTap;
   const PostCard({
-    Key? key,
+    super.key,
     required this.post,
     this.onLikeToggled,
     this.onShare,
     this.onLocationTap,
     this.onTap,
     this.onAuthorityTap,
-  }) : super(key: key);
+    this.doubleTap,
+  });
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -201,7 +202,6 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
       debugPrint('Error opening map: $e');
     }
   }
-
 
   void _toggleLike() {
     setState(() {
@@ -336,7 +336,10 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
                   top: Radius.circular(0),
                   bottom: Radius.circular(6),
                 ),
-                child: _loadImage(widget.post.photoUrl),
+                child: GestureDetector(
+                  onDoubleTap: _toggleLike, // ✅ Double tap to upvote
+                  child: _loadImage(widget.post.photoUrl),
+                ),
               ),
             ),
 
