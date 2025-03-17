@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import '../widgets/post_card.dart';
 import 'add_post_screen.dart';
 import 'user_profile_screen.dart';
 import 'leaderboard_screen.dart'; 
 import '../widgets/bottom_navbar.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,63 +18,29 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
-  bool _showElevation = false;
-
+  final bool _showElevation = false;
   // Sample posts data converted to PostCardModel format
-  final List<PostCardModel> _posts = [
-    PostCardModel(
-      id: '1',
-      location: "Delhi, India",
-      photoUrl: "https://media.istockphoto.com/id/865297750/photo/litter-on-the-street.jpg?s=612x612&w=0&k=20&c=fSWi30g42yaiBYIVP9bAQi9hme6E4Cy79bc7EIvaBSA=",
-      heading: "#DirtyStreet",
-      description: "Dirty street at India Gate, Delhi.",
-      authorities: ["Admin", "Verified", "Govt"],
-      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-      initialLikeCount: 124,
-    ),
-    PostCardModel(
-      id: '2',
-      location: "Mumbai, India",
-      photoUrl: "https://images.unsplash.com/photo-1560347876-aeef00ee58a1",
-      heading: "#MarineDrive",
-      description: "Chilling at Marine Drive during sunset.",
-      authorities: ["Verified", "Tourism"],
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      initialLikeCount: 89,
-    ),
-    PostCardModel(
-      id: '3',
-      location: "Delhi, India",
-      photoUrl: "https://media.istockphoto.com/id/929942316/photo/old-highway-with-holes-and-snow-landscape-road-potholes-in-cloudy-winter-weather-concept.jpg?s=612x612&w=0&k=20&c=ZtK8wJgXLQYEWGMJVGeyZBqVPKsdHMQlml1Vx8i17aw=",
-      heading: "#DelhiRoads",
-      description: "Very Bad condition of Roads.",
-      authorities: ["Municipal", "Pwd"],
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      initialLikeCount: 152,
-    ),
-  ];
-
+  List<PostCardModel> _posts = [];
   String _selectedCity = 'Delhi, India'; // Default city for local feed
-
-  final List<String> _cities = [
-    'Delhi, India',
-    'Mumbai, India',
-    'Chennai, India',
-    'Kolkata, India',
-    'Bangalore, India'
-  ];
+  List<String> _cities = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
-    // Listen to scroll events to show/hide elevation
-    _scrollController.addListener(() {
+    //Calling A.P.I from
+    loadFromJsonCities('assets/cities.json').then((posts) {
       setState(() {
-        _showElevation = _scrollController.offset > 0;
+        _cities = posts;
       });
+      });
+    loadFromJson('assets/posts.json').then((posts) {
+      setState(() {
+        _posts = posts;
+      });
+    
     });
+    //Listen to scroll events to show/hide elevation
   }
 
   @override
@@ -80,26 +49,70 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _scrollController.dispose();
     super.dispose();
   }
+  Future<List<PostCardModel>> loadFromJson(String fileName) async {
+    try {
+      // Load the JSON file
+      String jsonString = await rootBundle.loadString(fileName);
+      // Decode the JSON
+      List<dynamic> jsonList = json.decode(jsonString);
 
-  void _addNewPost(PostCardModel post) {
-    setState(() => _posts.insert(0, post)); // Add on top
+      List<PostCardModel> posts = jsonList.map((json) => PostCardModel.fromJson(json)).toList();
+
+      return posts;
+    } catch (e) {
+      return [];
+    }
   }
+  Future<List<String>> loadFromJsonCities(String fileName) async {
+    try {
+      // Load the JSON file
+      String jsonString = await rootBundle.loadString('assets/cities.json');
 
-  void _handleLikeToggled(String postId, bool isLiked) {
+      // Decode and cast to List<String>
+      List<dynamic> jsonList = json.decode(jsonString);
+      List<String> cities = jsonList.cast<String>();
+
+      return cities;
+    } catch (e) {
+      return [];
+    }
+  }
+  //Use adding post A.P.I. here with backend
+  void _addNewPost(PostCardModel post) {
+    setState(() => _posts.insert(0, post));
+    setState(() {
+      if (!_cities.contains(post.city)) {
+        _cities.add(post.city);
+      }
+    });
+  }
+  //Use upvote A.P.I. here with backend
+  void _handleUpvote(String postId, bool isLiked) {
     // This would typically be an API call in a real app
     debugPrint('Post $postId like toggled to $isLiked');
     // You could update a backend or perform additional actions here
   }
 
-  void _handleShare(String postId) {
-    // Implement share functionality
-    debugPrint('Sharing post $postId');
+  void _handleShare(PostCardModel post) {
+    final String contentToShare = '''
+      📢 ${post.heading}
+
+      📍 Location: ${post.location}
+      📝 Description: ${post.description}
+
+      🚨 Authorities Involved: ${post.authorities.join(', ')}
+      ❤️ Likes: ${post.initialLikeCount}
+      ''';
+
+    Share.share(contentToShare, subject: 'Check out this issue reported on ${post.location}!');
+
+    // Optional feedback on UI (snackbar)
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Sharing post $postId'))
+      SnackBar(content: Text('Sharing post...')),
     );
   }
-
-  void _handleAuthorityTap(String authority) {
+  
+  void _handleTagClick(String authority) {
     debugPrint('Authority tapped: $authority');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Viewing $authority posts'))
@@ -109,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -155,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     Icon(Icons.camera_alt, color: theme.colorScheme.primary, size: 24),
                     const SizedBox(width: 6),
                     Text(
-                      'JantaGram', 
+                      'CityGram', 
                       style: TextStyle(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
@@ -194,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
                 // Feed filtered by selected city
                 _buildFeedList(
-                  _posts.where((post) => post.location == _selectedCity).toList()
+                  _posts.where((post) => post.city == _selectedCity).toList()
                 ),
               ],
             ),
@@ -210,6 +222,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: theme.colorScheme.primary,
+          foregroundColor: Colors.white,
           onPressed: () {
             Navigator.push(
               context,
@@ -295,9 +308,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             delegate: SliverChildBuilderDelegate(
               (context, index) => PostCard(
                 post: posts[index],
-                onLikeToggled: _handleLikeToggled,
-                onShare: _handleShare,
-                onAuthorityTap: _handleAuthorityTap,
+                onLikeToggled: _handleUpvote,
+                onShare: (postId) {
+                  final post = posts.firstWhere((p) => p.id == postId);
+                  _handleShare(post);
+                }, // ✅ Correctly accepts postId and handles it
+                onAuthorityTap: _handleTagClick,
                 onTap: (postId) {
                   // Navigate to post detail screen if needed
                   debugPrint('Post $postId tapped');
@@ -337,7 +353,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
           );
-  }
+    }
 }
-
 // You'll need to update this class as well to work with PostCardModel

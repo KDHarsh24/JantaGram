@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 class PostCardModel {
   final String id;
+  final String city;
+  final String cords;
   final String location;
   final String photoUrl;
   final String heading;
@@ -18,6 +20,8 @@ class PostCardModel {
   // ✅ Constructor (without const)
   PostCardModel({
     required this.id,
+    required this.cords,
+    required this.city,
     required this.location,
     required this.photoUrl,
     required this.heading,
@@ -31,6 +35,8 @@ class PostCardModel {
   // ✅ Factory constructor for creating an instance with the current timestamp
   factory PostCardModel.withTimestamp({
     required String id,
+    required String cords,
+    required String city,
     required String location,
     required String photoUrl,
     required String heading,
@@ -41,6 +47,8 @@ class PostCardModel {
   }) {
     return PostCardModel(
       id: id,
+      cords: cords,
+      city: city,
       location: location,
       photoUrl: photoUrl,
       heading: heading,
@@ -56,9 +64,11 @@ class PostCardModel {
   factory PostCardModel.fromJson(Map<String, dynamic> json) {
     return PostCardModel(
       id: json['id'] ?? '',
+      cords: json['cords'] ?? '',
       location: json['location'] ?? '',
       photoUrl: json['photoUrl'] ?? '',
       heading: json['heading'] ?? '',
+      city: json['city'] ?? '',
       description: json['description'] ?? '',
       authorities: List<String>.from(json['authorities'] ?? ['Public']),
       timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
@@ -171,24 +181,27 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> _openMap(String address) async {
+  Future<void> _openMap(String coordinates) async {
     try {
-      final query = Uri.encodeComponent(address);
+      final query = Uri.encodeComponent(coordinates); // Coordinates like "26.9124,75.7873"
       final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$query";
       final Uri uri = Uri.parse(googleMapsUrl);
 
+      // Handle custom location tap event if provided
       if (widget.onLocationTap != null) {
         widget.onLocationTap!(widget.post.id);
         return;
       }
 
+      // Try launching Google Maps
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        throw 'Could not open Maps for $address';
+        throw 'Could not open Maps for coordinates $coordinates';
       }
     } catch (e) {
       debugPrint('Error opening map: $e');
     }
   }
+
 
   void _toggleLike() {
     setState(() {
@@ -275,7 +288,7 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
                     const SizedBox(width: 4),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => _openMap(widget.post.location),
+                        onTap: () => _openMap(widget.post.cords),
                         child: Text(
                           widget.post.location,
                           style: TextStyle(
@@ -367,7 +380,7 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
                         ),
                         child: IconButton(
                           icon: Icon(
-                            isLiked ? Icons.favorite : Icons.favorite_border,
+                            isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
                             color: isLiked ? Colors.red : Colors.grey[600],
                           ),
                           onPressed: _toggleLike,

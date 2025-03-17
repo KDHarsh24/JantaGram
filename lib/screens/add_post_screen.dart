@@ -4,12 +4,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:intl/intl.dart';
 
 class AddPostScreen extends StatefulWidget {
   final Function(Map<String, dynamic>) onPostAdded;
 
-  const AddPostScreen({Key? key, required this.onPostAdded}) : super(key: key);
+  const AddPostScreen({super.key, required this.onPostAdded});
 
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
@@ -22,16 +21,15 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   String _location = "Fetching location...";
   String _resolvedAddress = "Fetching address...";
   String _city = "Fetching city...";
-  Position? _position;
   bool _isLoading = true;
   bool _previewMode = false;
   late AnimationController _animationController;
   
   final List<String> _authorities = [
-    "Municipal Department",
+    "Municipality",
     "Police Department",
     "Public Works Department",
-    "Health Department",
+    "HealthCare",
     "Environment Department",
   ];
   final List<String> _selectedAuthorities = [];
@@ -80,7 +78,7 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
       setState(() => _location = "Location permission denied.");
     }
   }
-
+  
   /// Pick Image from Camera safely
   Future<void> _pickImage() async {
     final status = await Permission.camera.request();
@@ -135,7 +133,6 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
 
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      _position = position;
       _location = "${position.latitude}, ${position.longitude}";
     });
 
@@ -185,6 +182,7 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
       widget.onPostAdded({
         "id": DateTime.now().millisecondsSinceEpoch.toString(),
         "city": _city,
+        "cords": _location,
         "location": _resolvedAddress,
         "photoUrl": _image!.path,
         "heading": _titleController.text,
@@ -533,11 +531,11 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
 
           // Location display
           Text(
-            "Location: $_location",
+            "cords: $_location",
             style: theme.textTheme.bodyMedium,
           ),
           Text(
-            "Resolved Address: $_resolvedAddress",
+            "Location: $_resolvedAddress",
             style: theme.textTheme.bodyMedium,
           ),
           Text(
