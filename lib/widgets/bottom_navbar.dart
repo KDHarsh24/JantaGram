@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart'; 
 import '../screens/user_profile_screen.dart'; 
 import '../screens/leaderboard_screen.dart'; 
+// import '../screens/in_progress_screen.dart'; 
+// import '../screens/solved_screen.dart';
 // TODO: Import other screens if needed
 
 class BottomNavBar extends StatelessWidget {
@@ -29,7 +31,10 @@ class BottomNavBar extends StatelessWidget {
             );
             break;
           case 1:
-            // TODO: Navigate to Search Screen
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const InProgressScreen()),
+            // );
             break;
           case 2:
             Navigator.pushReplacement(
@@ -38,7 +43,10 @@ class BottomNavBar extends StatelessWidget {
             );
             break;
           case 3:
-            // TODO: Navigate to Likes Screen
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const SolvedScreen()),
+            // );
             break;
           case 4:
             Navigator.pushReplacement(
@@ -54,16 +62,16 @@ class BottomNavBar extends StatelessWidget {
           label: "Home",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: "Search",
+          icon: Icon(Icons.construction),
+          label: "In Progress",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.leaderboard),
           label: "Leaderboard",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite),
-          label: "Likes",
+          icon: Icon(Icons.check_circle),
+          label: "Solved",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

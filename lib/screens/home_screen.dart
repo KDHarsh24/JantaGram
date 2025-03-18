@@ -286,9 +286,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 SliverToBoxAdapter(
                   child: _buildCitySelector(),
                 ),
-                // Feed filtered by selected city
+                // Feed filtered by selected city and status
                 _buildFeedList(
-                  _posts.where((post) => post.city == _selectedCity).toList()
+                  _posts.where((post) => post.city == _selectedCity && post.status == "unsolved").toList()
                 ),
               ],
             ),

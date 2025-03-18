@@ -25,6 +25,8 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   bool _previewMode = false;
   late AnimationController _animationController;
   
+  String _selectedStatus = "unsolved"; // ✅ Initialize status variable
+  
   final List<String> _authorities = [
     "Municipality",
     "Police Department",
@@ -506,7 +508,29 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
           ),
 
           const SizedBox(height: 16),
-
+ 
+          // Status selection dropdown
+          DropdownButtonFormField<String>(
+            value: _selectedStatus,
+            onChanged: (value) {
+              setState(() {
+                _selectedStatus = value!;
+              });
+            },
+            items: ["unsolved", "inprogress", "solved"].map((status) {
+              return DropdownMenuItem(
+                value: status,
+                child: Text(status[0].toUpperCase() + status.substring(1)),
+              );
+            }).toList(),
+            decoration: InputDecoration(
+              labelText: "Status",
+              border: OutlineInputBorder(),
+            ),
+          ),
+ 
+          const SizedBox(height: 16),
+ 
           // Authorities selection
           Text("Select Authorities:", style: theme.textTheme.titleMedium),
           Wrap(

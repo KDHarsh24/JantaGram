@@ -10,7 +10,8 @@
     "authorities": ["Municipal", "Health"],
     "timestamp": "2025-03-16T10:00:00Z",
     "likeCount": 124,
-    "isLikedByUser": true
+    "isLikedByUser": true,
+    "status": "unsolved"
   },
   {
     "id": "2",
@@ -22,7 +23,8 @@
     "description": "Badly damaged roads near Marine Drive, risky for commuters.",
     "authorities": ["Municipal", "Public Work Department"],
     "timestamp": "2025-03-15T08:30:00Z",
-    "initialLikeCount": 95
+    "initialLikeCount": 95,
+    "status": "inprogress"
   },
   {
     "id": "3",
@@ -34,7 +36,8 @@
     "description": "Huge potholes near Anna Salai, causing accidents.",
     "authorities": ["Public Work Department"],
     "timestamp": "2025-03-14T06:00:00Z",
-    "initialLikeCount": 78
+    "initialLikeCount": 78,
+    "status": "solved"
   },
   {
     "id": "4",
@@ -46,7 +49,8 @@
     "description": "Contaminated water near Ganga river banks, public health at risk.",
     "authorities": ["Health", "Municipal"],
     "timestamp": "2025-03-13T12:45:00Z",
-    "initialLikeCount": 134
+    "initialLikeCount": 134,
+    "status": "inprogress"
   },
   {
     "id": "5",
@@ -58,7 +62,8 @@
     "description": "Waste not collected for weeks in busy areas of MG Road.",
     "authorities": ["Municipal"],
     "timestamp": "2025-03-12T09:15:00Z",
-    "initialLikeCount": 110
+    "initialLikeCount": 110,
+    "status": "solved"
   },
   {
     "id": "6",
@@ -70,7 +75,8 @@
     "description": "Overflowing drainage causing severe health issues in Charminar area.",
     "authorities": ["Municipal", "Health"],
     "timestamp": "2025-03-11T07:00:00Z",
-    "initialLikeCount": 88
+    "initialLikeCount": 88,
+    "status": "unsolved"
   },
   {
     "id": "7",
@@ -82,7 +88,8 @@
     "description": "Massive traffic jam causing delays during office hours.",
     "authorities": ["Traffic Police"],
     "timestamp": "2025-03-10T18:00:00Z",
-    "initialLikeCount": 56
+    "initialLikeCount": 56,
+    "status": "solved"
   },
   {
     "id": "8",
@@ -94,66 +101,332 @@
     "description": "Dangerous overcrowding at Dadar station during peak hours.",
     "authorities": ["Railway", "Police"],
     "timestamp": "2025-03-09T17:00:00Z",
-    "initialLikeCount": 102
+    "initialLikeCount": 102,
+    "status": "unsolved"
   },
   {
-    "id": "1",
+    "id": "9",
     "city": "Delhi",
-    "location": "India Gate, Delhi",
-    "cords": "28.6139,77.2090",
-    "photoUrl": "https://media.istockphoto.com/id/865297750/photo/litter-on-the-street.jpg?s=612x612&w=0&k=20&c=fSWi30g42yaiBYIVP9bAQi9hme6E4Cy79bc7EIvaBSA=",
-    "heading": "#GarbageProblem",
-    "description": "Overflowing garbage near India Gate, causing hygiene issues.",
+    "location": "Chandni Chowk, Delhi",
+    "cords": "28.6562,77.2301",
+    "photoUrl": "https://example.com/streetlight.jpg",
+    "heading": "#BrokenStreetlights",
+    "description": "Several streetlights are not functioning, leading to safety concerns at night.",
+    "authorities": ["Municipal", "Electricity Board"],
+    "timestamp": "2025-03-08T19:00:00Z",
+    "initialLikeCount": 45,
+    "status": "unsolved"
+  },
+  {
+    "id": "10",
+    "city": "Delhi",
+    "location": "Lajpat Nagar, Delhi",
+    "cords": "28.5820,77.2320",
+    "photoUrl": "https://example.com/pollution.jpg",
+    "heading": "#AirPollution",
+    "description": "Severe air pollution in Lajpat Nagar affecting residents' health.",
+    "authorities": ["Health", "Municipal"],
+    "timestamp": "2025-03-07T15:00:00Z",
+    "initialLikeCount": 60,
+    "status": "unsolved"
+  },
+  {
+    "id": "11",
+    "city": "Delhi",
+    "location": "Saket, Delhi",
+    "cords": "28.5275,77.2189",
+    "photoUrl": "https://example.com/sanitation.jpg",
+    "heading": "#SanitationIssue",
+    "description": "Poor sanitation facilities in Saket leading to health hazards.",
     "authorities": ["Municipal", "Health"],
-    "timestamp": "2025-03-16T10:00:00Z",
-    "initialLikeCount": 124
+    "timestamp": "2025-03-06T14:00:00Z",
+    "initialLikeCount": 50,
+    "status": "unsolved"
   },
   {
-    "id": "2",
-    "city": "Mumbai",
-    "location": "Marine Drive, Mumbai",
-    "cords": "18.9218,72.8345",
-    "photoUrl": "https://images.unsplash.com/photo-1560347876-aeef00ee58a1",
-    "heading": "#BrokenRoads",
-    "description": "Badly damaged roads near Marine Drive, risky for commuters.",
-    "authorities": ["Municipal", "Public Work Department"],
-    "timestamp": "2025-03-15T08:30:00Z",
-    "initialLikeCount": 95
-  },
-  {
-    "id": "3",
+    "id": "12",
     "city": "Delhi",
-    "location": "Anna Salai, Delhi",
-    "cords": "28.6139,77.2090",
-    "photoUrl": "https://media.istockphoto.com/id/929942316/photo/old-highway-with-holes-and-snow-landscape-road-potholes-in-cloudy-winter-weather-concept.jpg?s=612x612&w=0&k=20&c=ZtK8wJgXLQYEWGMJVGeyZBqVPKsdHMQlml1Vx8i17aw=",
-    "heading": "#Potholes",
-    "description": "Huge potholes near Anna Salai, causing accidents.",
+    "location": "Dwarka, Delhi",
+    "cords": "28.5732,77.0678",
+    "photoUrl": "https://example.com/infrastructure.jpg",
+    "heading": "#InfrastructureProblems",
+    "description": "Infrastructure issues in Dwarka causing inconvenience to residents.",
+    "authorities": ["Municipal"],
+    "timestamp": "2025-03-05T12:00:00Z",
+    "initialLikeCount": 70,
+    "status": "unsolved"
+  },
+  {
+    "id": "13",
+    "city": "Delhi",
+    "location": "Vasant Kunj, Delhi",
+    "cords": "28.5279,77.1556",
+    "photoUrl": "https://example.com/road.jpg",
+    "heading": "#BadRoads",
+    "description": "Roads in Vasant Kunj are in poor condition, causing accidents.",
     "authorities": ["Public Work Department"],
-    "timestamp": "2025-03-14T06:00:00Z",
-    "initialLikeCount": 78
+    "timestamp": "2025-03-04T09:00:00Z",
+    "initialLikeCount": 55,
+    "status": "unsolved"
   },
   {
-    "id": "7",
-    "city": "Delhi",
-    "location": "Connaught Place, Delhi",
-    "cords": "28.6304,77.2177",
-    "photoUrl": "https://media.istockphoto.com/id/1175486910/photo/traffic-jam.jpg?s=612x612&w=0&k=20&c=smUMSYYVZfbsQeaf2Z9jAq_9pmkMsPL-AkF9bBlt3FQ=",
-    "heading": "#TrafficJam",
-    "description": "Massive traffic jam causing delays during office hours.",
-    "authorities": ["Traffic Police"],
-    "timestamp": "2025-03-10T18:00:00Z",
-    "initialLikeCount": 56
-  },
-  {
-    "id": "8",
+    "id": "14",
     "city": "Mumbai",
-    "location": "Dadar Station, Mumbai",
-    "cords": "19.0183,72.8440",
-    "photoUrl": "https://media.istockphoto.com/id/1125722384/photo/mumbai-dadar-station-crowd.jpg?s=612x612&w=0&k=20&c=AhHjwVz_PW_7b1Q8bnhAD4qDazTu7GJ2tbgk1LGwJ2Q=",
-    "heading": "#OverCrowdedStation",
-    "description": "Dangerous overcrowding at Dadar station during peak hours.",
-    "authorities": ["Railway", "Police"],
-    "timestamp": "2025-03-09T17:00:00Z",
-    "initialLikeCount": 102
+    "location": "Andheri, Mumbai",
+    "cords": "19.0973,72.8347",
+    "photoUrl": "https://example.com/streetlight_mumbai.jpg",
+    "heading": "#StreetlightOutage",
+    "description": "Streetlights out on major roads in Andheri, creating safety issues.",
+    "authorities": ["Municipal", "Electricity Board"],
+    "timestamp": "2025-03-08T19:00:00Z",
+    "initialLikeCount": 30,
+    "status": "unsolved"
+  },
+  {
+    "id": "15",
+    "city": "Mumbai",
+    "location": "Bandra, Mumbai",
+    "cords": "19.0594,72.8312",
+    "photoUrl": "https://example.com/pollution_mumbai.jpg",
+    "heading": "#WaterPollution",
+    "description": "Water pollution in Bandra affecting local marine life.",
+    "authorities": ["Environmental", "Municipal"],
+    "timestamp": "2025-03-07T15:00:00Z",
+    "initialLikeCount": 45,
+    "status": "unsolved"
+  },
+  {
+    "id": "16",
+    "city": "Mumbai",
+    "location": "Thane, Mumbai",
+    "cords": "19.2183,72.9781",
+    "photoUrl": "https://example.com/sanitation_mumbai.jpg",
+    "heading": "#SanitationProblems",
+    "description": "Sanitation issues in Thane leading to public health concerns.",
+    "authorities": ["Municipal", "Health"],
+    "timestamp": "2025-03-06T14:00:00Z",
+    "initialLikeCount": 50,
+    "status": "unsolved"
+  },
+  {
+    "id": "17",
+    "city": "Mumbai",
+    "location": "Dadar, Mumbai",
+    "cords": "19.0176,72.8471",
+    "photoUrl": "https://example.com/infrastructure_mumbai.jpg",
+    "heading": "#InfrastructureIssues",
+    "description": "Infrastructure problems in Dadar causing traffic congestion.",
+    "authorities": ["Municipal"],
+    "timestamp": "2025-03-05T12:00:00Z",
+    "initialLikeCount": 60,
+    "status": "unsolved"
+  },
+  {
+    "id": "18",
+    "city": "Mumbai",
+    "location": "Juhu, Mumbai",
+    "cords": "19.0970,72.8263",
+    "photoUrl": "https://example.com/road_mumbai.jpg",
+    "heading": "#BadRoads",
+    "description": "Poor road conditions in Juhu impacting daily commutes.",
+    "authorities": ["Public Work Department"],
+    "timestamp": "2025-03-04T09:00:00Z",
+    "initialLikeCount": 55,
+    "status": "unsolved"
+  },
+  {
+    "id": "19",
+    "city": "Kolkata",
+    "location": "Salt Lake, Kolkata",
+    "cords": "22.5772,88.4016",
+    "photoUrl": "https://example.com/sanitation_kolkata.jpg",
+    "heading": "#SanitationKolkata",
+    "description": "Sanitation facilities in Salt Lake are inadequate and poorly maintained.",
+    "authorities": ["Municipal", "Health"],
+    "timestamp": "2025-03-08T19:00:00Z",
+    "initialLikeCount": 40,
+    "status": "unsolved"
+  },
+  {
+    "id": "20",
+    "city": "Kolkata",
+    "location": "Howrah, Kolkata",
+    "cords": "22.5957,88.3639",
+    "photoUrl": "https://example.com/pollution_kolkata.jpg",
+    "heading": "#WaterPollutionKolkata",
+    "description": "Water pollution in Howrah affecting local communities.",
+    "authorities": ["Environmental", "Municipal"],
+    "timestamp": "2025-03-07T15:00:00Z",
+    "initialLikeCount": 35,
+    "status": "unsolved"
+  },
+  {
+    "id": "21",
+    "city": "Kolkata",
+    "location": "Shyambazar, Kolkata",
+    "cords": "22.5788,88.3678",
+    "photoUrl": "https://example.com/infrastructure_kolkata.jpg",
+    "heading": "#InfrastructureKolkata",
+    "description": "Infrastructure issues in Shyambazar causing traffic disruptions.",
+    "authorities": ["Municipal"],
+    "timestamp": "2025-03-06T14:00:00Z",
+    "initialLikeCount": 50,
+    "status": "unsolved"
+  },
+  {
+    "id": "22",
+    "city": "Kolkata",
+    "location": "Dum Dum, Kolkata",
+    "cords": "22.5883,88.4206",
+    "photoUrl": "https://example.com/road_kolkata.jpg",
+    "heading": "#BadRoadsKolkata",
+    "description": "Bad roads in Dum Dum causing accidents and delays.",
+    "authorities": ["Public Work Department"],
+    "timestamp": "2025-03-05T12:00:00Z",
+    "initialLikeCount": 60,
+    "status": "unsolved"
+  },
+  {
+    "id": "23",
+    "city": "Kolkata",
+    "location": "Gariahat, Kolkata",
+    "cords": "22.5076,88.3684",
+    "photoUrl": "https://example.com/streetlight_kolkata.jpg",
+    "heading": "#BrokenStreetlightsKolkata",
+    "description": "Streetlights not functioning in Gariahat, causing safety issues.",
+    "authorities": ["Municipal", "Electricity Board"],
+    "timestamp": "2025-03-04T09:00:00Z",
+    "initialLikeCount": 45,
+    "status": "unsolved"
+  },
+  {
+    "id": "24",
+    "city": "Bangalore",
+    "location": "Koramangala, Bangalore",
+    "cords": "12.9352,77.6241",
+    "photoUrl": "https://example.com/sanitation_bangalore.jpg",
+    "heading": "#SanitationBangalore",
+    "description": "Sanitation facilities in Koramangala are inadequate.",
+    "authorities": ["Municipal", "Health"],
+    "timestamp": "2025-03-08T19:00:00Z",
+    "initialLikeCount": 40,
+    "status": "unsolved"
+  },
+  {
+    "id": "25",
+    "city": "Bangalore",
+    "location": "Indiranagar, Bangalore",
+    "cords": "12.9674,77.6417",
+    "photoUrl": "https://example.com/pollution_bangalore.jpg",
+    "heading": "#AirPollutionBangalore",
+    "description": "Air pollution in Indiranagar is affecting residents' health.",
+    "authorities": ["Health", "Environmental"],
+    "timestamp": "2025-03-07T15:00:00Z",
+    "initialLikeCount": 35,
+    "status": "unsolved"
+  },
+  {
+    "id": "26",
+    "city": "Bangalore",
+    "location": "MG Road, Bangalore",
+    "cords": "12.9716,77.5946",
+    "photoUrl": "https://example.com/infrastructure_bangalore.jpg",
+    "heading": "#InfrastructureBangalore",
+    "description": "Infrastructure issues in MG Road causing traffic jams.",
+    "authorities": ["Municipal"],
+    "timestamp": "2025-03-06T14:00:00Z",
+    "initialLikeCount": 50,
+    "status": "unsolved"
+  },
+  {
+    "id": "27",
+    "city": "Bangalore",
+    "location": "Whitefield, Bangalore",
+    "cords": "12.9613,77.7491",
+    "photoUrl": "https://example.com/road_bangalore.jpg",
+    "heading": "#BadRoadsBangalore",
+    "description": "Bad roads in Whitefield causing accidents and delays.",
+    "authorities": ["Public Work Department"],
+    "timestamp": "2025-03-05T12:00:00Z",
+    "initialLikeCount": 60,
+    "status": "unsolved"
+  },
+  {
+    "id": "28",
+    "city": "Bangalore",
+    "location": "Jayanagar, Bangalore",
+    "cords": "12.9334,77.5855",
+    "photoUrl": "https://example.com/streetlight_bangalore.jpg",
+    "heading": "#BrokenStreetlightsBangalore",
+    "description": "Streetlights out in Jayanagar, leading to safety concerns.",
+    "authorities": ["Municipal", "Electricity Board"],
+    "timestamp": "2025-03-04T09:00:00Z",
+    "initialLikeCount": 45,
+    "status": "unsolved"
+  },
+  {
+    "id": "29",
+    "city": "Hyderabad",
+    "location": "Banjara Hills, Hyderabad",
+    "cords": "17.4213,78.4484",
+    "photoUrl": "https://example.com/pollution_hyderabad.jpg",
+    "heading": "#AirPollutionHyderabad",
+    "description": "Air pollution in Banjara Hills affecting local residents.",
+    "authorities": ["Health", "Environmental"],
+    "timestamp": "2025-03-08T19:00:00Z",
+    "initialLikeCount": 40,
+    "status": "unsolved"
+  },
+  {
+    "id": "30",
+    "city": "Hyderabad",
+    "location": "Hitech City, Hyderabad",
+    "cords": "17.4458,78.3882",
+    "photoUrl": "https://example.com/infrastructure_hyderabad.jpg",
+    "heading": "#InfrastructureHyderabad",
+    "description": "Infrastructure issues in Hitech City causing traffic jams.",
+    "authorities": ["Municipal"],
+    "timestamp": "2025-03-07T15:00:00Z",
+    "initialLikeCount": 35,
+    "status": "unsolved"
+  },
+  {
+    "id": "31",
+    "city": "Hyderabad",
+    "location": "Secunderabad, Hyderabad",
+    "cords": "17.4398,78.4984",
+    "photoUrl": "https://example.com/sanitation_hyderabad.jpg",
+    "heading": "#SanitationHyderabad",
+    "description": "Sanitation issues in Secunderabad causing public health concerns.",
+    "authorities": ["Municipal", "Health"],
+    "timestamp": "2025-03-06T14:00:00Z",
+    "initialLikeCount": 50,
+    "status": "unsolved"
+  },
+  {
+    "id": "32",
+    "city": "Hyderabad",
+    "location": "Old City, Hyderabad",
+    "cords": "17.3660,78.4747",
+    "photoUrl": "https://example.com/road_hyderabad.jpg",
+    "heading": "#BadRoadsHyderabad",
+    "description": "Bad roads in Old City causing accidents and delays.",
+    "authorities": ["Public Work Department"],
+    "timestamp": "2025-03-05T12:00:00Z",
+    "initialLikeCount": 60,
+    "status": "unsolved"
+  },
+  {
+    "id": "33",
+    "city": "Hyderabad",
+    "location": "LB Nagar, Hyderabad",
+    "cords": "17.3555,78.5547",
+    "photoUrl": "https://example.com/streetlight_hyderabad.jpg",
+    "heading": "#BrokenStreetlightsHyderabad",
+    "description": "Streetlights out in LB Nagar, creating safety concerns.",
+    "authorities": ["Municipal", "Electricity Board"],
+    "timestamp": "2025-03-04T09:00:00Z",
+    "initialLikeCount": 45,
+    "status": "unsolved"
   }
 ]

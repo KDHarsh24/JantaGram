@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/user_profile_screen.dart'; // Import User Profile Page
 import './screens/registerpage.dart';
+
 void main() {
   runApp(const JantaGram());
 }
@@ -20,9 +21,9 @@ class JantaGram extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ✅ Define Routes
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(email: 'harshkumardas24@gmail.com',),
+        '/': (context) => const HomeScreen(email: 'harshkumardas24@gmail.com'),
         '/profile': (context) => UserProfileScreen(),
         '/login': (context) => RegisterPage(email: 'harshkumardas24@gmail.com'),
       },

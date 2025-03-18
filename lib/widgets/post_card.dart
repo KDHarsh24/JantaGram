@@ -12,6 +12,7 @@ class PostCardModel {
   final String photoUrl;
   final String heading;
   final String description;
+  final String status;
   final List<String> authorities;
   final DateTime timestamp;
   final int initialLikeCount;
@@ -26,6 +27,7 @@ class PostCardModel {
     required this.photoUrl,
     required this.heading,
     required this.description,
+    required this.status,
     this.authorities = const ["Public"],
     required this.timestamp, // Removed default value
     this.initialLikeCount = 0,
@@ -41,6 +43,7 @@ class PostCardModel {
     required String photoUrl,
     required String heading,
     required String description,
+    required String status, // ✅ Add status
     List<String> authorities = const ["Public"],
     int initialLikeCount = 0,
     bool isInitiallyLiked = false,
@@ -53,6 +56,7 @@ class PostCardModel {
       photoUrl: photoUrl,
       heading: heading,
       description: description,
+      status: status,
       authorities: authorities,
       timestamp: DateTime.now(), // ✅ Set current time dynamically
       initialLikeCount: initialLikeCount,
@@ -70,6 +74,7 @@ class PostCardModel {
       heading: json['heading'] ?? '',
       city: json['city'] ?? '',
       description: json['description'] ?? '',
+      status: json['status'] ?? 'unsolved',
       authorities: List<String>.from(json['authorities'] ?? ['Public']),
       timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
       initialLikeCount: json['likeCount'] ?? 0,
@@ -85,6 +90,7 @@ class PostCardModel {
       'photoUrl': photoUrl,
       'heading': heading,
       'description': description,
+      'status': status,
       'authorities': authorities,
       'timestamp': timestamp.toIso8601String(),
       'likeCount': initialLikeCount,
