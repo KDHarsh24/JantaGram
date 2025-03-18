@@ -1,14 +1,19 @@
+import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geocoding/geocoding.dart';
+import '../config.dart';
+import 'package:http/http.dart' as http;
 
 class AddPostScreen extends StatefulWidget {
   final Function(Map<String, dynamic>) onPostAdded;
-
-  const AddPostScreen({super.key, required this.onPostAdded});
+  String email;
+  AddPostScreen({super.key, required this.onPostAdded, required this.email});
 
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
@@ -24,7 +29,7 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   bool _isLoading = true;
   bool _previewMode = false;
   late AnimationController _animationController;
-  
+  Uint8List? _imageBlob; 
   String _selectedStatus = "unsolved"; // ✅ Initialize status variable
   
   final List<String> _authorities = [
@@ -78,34 +83,39 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
     }
   }
   
-  /// Pick Image from Camera safely
   Future<void> _pickImage() async {
-    final status = await Permission.camera.request();
-    if (status.isDenied) {
-      setState(() => _location = "Camera permission denied.");
-      return;
-    } else if (status.isPermanentlyDenied) {
-      setState(() => _location = "Camera permission permanently denied. Enable it in settings.");
-      return;
-    }
-
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-      imageQuality: 85,
-      maxWidth: 1200,
-    );
-
-    if (pickedFile != null) {
-      setState(() => _image = File(pickedFile.path));
-    } else {
-      // User canceled taking a picture
-      if (_image == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please take a photo to continue")),
-        );
-      }
-    }
+  // Request camera permission
+  final status = await Permission.camera.request();
+  if (status.isDenied) {
+    debugPrint("Camera permission denied.");
+    return;
+  } else if (status.isPermanentlyDenied) {
+    debugPrint("Camera permission permanently denied. Enable it in settings.");
+    return;
   }
+
+  // Pick image from camera
+  final pickedFile = await ImagePicker().pickImage(
+    source: ImageSource.camera,
+    imageQuality: 85, // Optional: Compress image
+    maxWidth: 1200,  // Optional: Limit width
+  );
+
+  if (pickedFile != null) {
+    final File imageFile = File(pickedFile.path);
+    final Uint8List imageBytes = await imageFile.readAsBytes(); // ✅ Convert to Blob (bytes)
+
+    setState(() {
+      _image = imageFile;   // For preview if needed
+      _imageBlob = imageBytes; // ✅ Store as Blob in variable
+    });
+
+    debugPrint('✅ Image picked. Blob size: ${imageBytes.lengthInBytes} bytes');
+  } else {
+    debugPrint("No image selected.");
+  }
+}
+
 
   /// Get Location and Address with City Detection
   Future<void> _getLocation() async {
@@ -175,20 +185,42 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
   }
 
   /// Handle Upload Post
-  void _handleUpload() {
+  Future<void> _handleUpload() async {
     if (_image != null && _titleController.text.isNotEmpty) {
-      widget.onPostAdded({
+      Map<String, dynamic> data  = {
         "id": DateTime.now().millisecondsSinceEpoch.toString(),
         "city": _city,
         "cords": _location,
         "location": _resolvedAddress,
-        "photoUrl": _image!.path,
+        "photoUrl": base64Encode(_imageBlob!),
         "heading": _titleController.text,
         "description": _descriptionController.text,
         "authorities": _selectedAuthorities,
         "timestamp": DateTime.now().toIso8601String(),
         "isLikedByUser": false,
+        "email": widget.email
+      };
+      final String url = '${Config.baseUrl}/posts/create';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 201) {
+        print('OK');
+      } else {
+        setState(() {
+          print('Fail');
+        });
+      }
+    } catch (e) {
+      setState(() {
+        print('Bye');
       });
+    }
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -316,13 +348,16 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
                   top: Radius.circular(0),
                   bottom: Radius.circular(6),
                 ),
-                child: _image != null
-                    ? Image.file(
-                        _image!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 250,
-                      )
+                child: _imageBlob != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12), // Optional: Rounded corners
+                    child: Image.memory(
+                      _imageBlob!, // ✅ Display from blob
+                      width: double.infinity,
+                      height: 250,
+                      fit: BoxFit.cover, // Cover fit
+                    ),
+                  )
                     : Container(
                         width: double.infinity,
                         height: 250,
@@ -415,13 +450,21 @@ class _AddPostScreenState extends State<AddPostScreen> with SingleTickerProvider
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey.shade300, width: 1),
               ),
-              child: _image != null
+              child: _imageBlob != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.file(_image!, fit: BoxFit.cover),
+                         ClipRRect(
+                          borderRadius: BorderRadius.circular(12), // Optional: Rounded corners
+                          child: Image.memory(
+                            _imageBlob!, // ✅ Display from blob
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.cover, // Cover fit
+                          ),
+                        ),
                         Positioned(
                           bottom: 0,
                           left: 0,

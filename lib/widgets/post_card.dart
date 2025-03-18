@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,6 +12,7 @@ class PostCardModel {
   final String cords;
   final String location;
   final String photoUrl;
+  final Uint8List photoBlob;
   final String heading;
   final String description;
   final String status;
@@ -28,6 +31,7 @@ class PostCardModel {
     required this.heading,
     required this.description,
     required this.status,
+    required this.photoBlob,
     this.authorities = const ["Public"],
     required this.timestamp, // Removed default value
     this.initialLikeCount = 0,
@@ -47,6 +51,7 @@ class PostCardModel {
     List<String> authorities = const ["Public"],
     int initialLikeCount = 0,
     bool isInitiallyLiked = false,
+    required Uint8List photoBlob,
   }) {
     return PostCardModel(
       id: id,
@@ -61,13 +66,14 @@ class PostCardModel {
       timestamp: DateTime.now(), // ✅ Set current time dynamically
       initialLikeCount: initialLikeCount,
       isInitiallyLiked: isInitiallyLiked,
+      photoBlob: photoBlob
     );
   }
 
   // ✅ Factory constructor for API JSON
   factory PostCardModel.fromJson(Map<String, dynamic> json) {
     return PostCardModel(
-      id: json['id'] ?? '',
+      id: json['post_Id'] ?? '',
       cords: json['cords'] ?? '',
       location: json['location'] ?? '',
       photoUrl: json['photoUrl'] ?? '',
@@ -75,10 +81,11 @@ class PostCardModel {
       city: json['city'] ?? '',
       description: json['description'] ?? '',
       status: json['status'] ?? 'unsolved',
-      authorities: List<String>.from(json['authorities'] ?? ['Public']),
+      authorities: List<String>.from(json['authorities'] ?? json["authority"]?? ['Public']),
       timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
-      initialLikeCount: json['likeCount'] ?? 0,
-      isInitiallyLiked: json['isLikedByUser'] ?? false,
+      initialLikeCount: json['total_likes'] ?? 0,
+      isInitiallyLiked: json['like'] ?? false,
+      photoBlob: base64Decode(json['image_data'][0]['data'])
     );
   }
 
@@ -95,6 +102,7 @@ class PostCardModel {
       'timestamp': timestamp.toIso8601String(),
       'likeCount': initialLikeCount,
       'isLikedByUser': isInitiallyLiked,
+      'photoBlob' : photoBlob
     };
   }
 }
@@ -145,48 +153,29 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _loadImage(String url) {
-    if (url.isEmpty) {
-      return Container(
-        width: double.infinity,
-        height: 220,
-        color: Colors.grey[300],
-        child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-      );
-    }
-    
-    if (url.startsWith('/')) {
-      return Image.file(
-        File(url),
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: 250,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: double.infinity,
-            height: 250,
-            color: Colors.grey[300],
-            child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
-          );
-        },
-      );
-    }
-    
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: BoxFit.cover,
+Widget _loadImage(Uint8List? photoBlob) {
+  // ✅ If blob is null or empty, show placeholder
+  if (photoBlob == null) {
+    return Container(
       width: double.infinity,
-      height: 250,
-      placeholder: (context, url) => Container(
-        color: Colors.grey[200],
-        child: const Center(child: CircularProgressIndicator()),
-      ),
-      errorWidget: (context, url, error) => Container(
-        color: Colors.grey[300],
-        child: const Icon(Icons.error, size: 40, color: Colors.grey),
-      ),
+      height: 220,
+      color: Colors.grey[300],
+      child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
     );
   }
+
+  // ✅ Load image from memory
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(8), // Optional rounded corners
+    child: Image.memory(
+                photoBlob, // ✅ Display from blob
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.cover, // Cover fit
+                          ),
+  );
+}
+
 
   Future<void> _openMap(String coordinates) async {
     try {
@@ -344,7 +333,7 @@ class _PostCardState extends State<PostCard> with SingleTickerProviderStateMixin
                 ),
                 child: GestureDetector(
                   onDoubleTap: _toggleLike, // ✅ Double tap to upvote
-                  child: _loadImage(widget.post.photoUrl),
+                  child: _loadImage(widget.post.photoBlob),
                 ),
               ),
             ),

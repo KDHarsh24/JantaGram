@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
@@ -12,7 +13,7 @@ import '../config.dart';
 
 class HomeScreen extends StatefulWidget {
   final String email;
-
+  
   const HomeScreen({Key ? key, required this.email}): super(key: key);
 
   @override
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   String _selectedCity = 'Chennai'; // Default city for local feed
   List<String> _cities = [];
   bool isLoading = false;
+  late Map<String, dynamic> postFetchfeed = {};
   @override
   void initState() {
     super.initState();
@@ -42,8 +44,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       setState(() {
         _posts = posts;
       });
-    
     });
+    _fetchFeed();
     //Listen to scroll events to show/hide elevation
   }
 
@@ -53,84 +55,81 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _scrollController.dispose();
     super.dispose();
   }
-//   Future<void> _fetchFeed() async {
-//   try {
-//     setState(() {
-//       isLoading = true;
-//     });
+  Future<void> _fetchFeed() async {
+  try {
+    setState(() {
+      isLoading = true;
+    });
 
-//     final String url = '${Config.baseUrl}/getemail';
-    
-//     final response = await http.post(
-//       Uri.parse(url),
-//       headers: {
-//         "Content-Type": "application/json",
-//         "Accept": "application/json"
-//       },
-//       body: json.encode({"email": widget.email}),
-//     ).timeout(
-//       const Duration(seconds: 10),
-//       onTimeout: () {
-//         throw TimeoutException('Request timed out');
-//       },
-//     );
+    final String url = '${Config.baseUrl}/post/feed';
 
-//     // Log response
-//     if (response.body.isEmpty) {
-//       throw Exception('Empty response received from server');
-//     }
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: json.encode({"email": widget.email}),
+    ).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        throw TimeoutException('Request timed out');
+      },
+    );
 
-//     final Map<String, dynamic> responseData = json.decode(response.body);
+    // Log response
+    //print(response.body);
+    if (response.body.isEmpty) {
+      throw Exception('Empty response received from server');
+    }
 
-//     if (!responseData.containsKey('success')) {
-//       throw Exception('Invalid response format: missing success field');
-//     }
+    final Map<String, dynamic> responseData = json.decode(response.body);
 
-//     if (!responseData['success']) {
-//       throw 'Student Not Found';
-//     }
 
-//     if (responseData['data'] == null) {
-//       setState(() {
-//         isLoading = false;
-//         studentData = {};
-//       });
-      
-//       if (!mounted) return;
-      
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('No student data available'),
-//           backgroundColor: Colors.orange,
-//         )
-//       );
-//       return;
-//     }
+    if (responseData['data'] == null || responseData['data'] is! List) {
+      setState(() {
+        isLoading = false;
+        _posts = [];
+      });
 
-//     setState(() {
-//       studentData = responseData['data'];
-//       isLoading = false;
-//     });
-//     if (studentData['student'] != null && 
-//         studentData['student']['rollNo'] != null) {
-//       await _fetchAttendanceTimes(studentData['student']['rollNo'].toString());
-//     }
-//     await Future.delayed(const Duration(seconds: 1));
-//   } catch (e) {
-//     setState(() {
-//       isLoading = false;
-//     });
-    
-//     if (!mounted) return;
-    
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text('Error: ${e.toString()}'),
-//         backgroundColor: Colors.red,
-//       )
-//     );
-//   }
-// }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No student data available'),
+          backgroundColor: Colors.orange,
+        )
+      );
+      return;
+    }
+
+    // ✅ Convert JSON array to List<PostCardModel>
+    List<PostCardModel> fetchedPosts = (responseData['data'] as List)
+        .map((item) => PostCardModel.fromJson(item))
+        .toList();
+
+    setState(() {
+      _posts = fetchedPosts;
+      isLoading = false;
+    });
+
+    await Future.delayed(const Duration(seconds: 1));
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: ${e.toString()}'),
+        backgroundColor: Colors.red,
+      )
+    );
+  }
+}
+
   Future<List<PostCardModel>> loadFromJson(String fileName) async {
     try {
       // Load the JSON file
@@ -169,11 +168,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
   //Use upvote A.P.I. here with backend
-  void _handleUpvote(String postId, bool isLiked) {
+  Future<void> _handleUpvote(String postId, bool isLiked) async{
     // This would typically be an API call in a real app
-    debugPrint('Post $postId like toggled to $isLiked');
+    final String url = '${Config.baseUrl}/likePost';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({"email": widget.email, "post_Id": postId}),
+      );
+
+      if (response.statusCode == 201) {
+        print('OK');
+      } else {
+        setState(() {
+          print('Fail');
+        });
+      }
+    } catch (e) {
+      setState(() {
+        print('Bye');
+      });
+    }
+    }
     // You could update a backend or perform additional actions here
-  }
 
   void _handleShare(PostCardModel post) {
     final String contentToShare = '''
@@ -312,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 builder: (context) => AddPostScreen(
                   onPostAdded: (Map<String, dynamic> postData) {
                     _addNewPost(PostCardModel.fromJson(postData));
-                  },
+                  }, email: widget.email,
                 ),
               ),
             );
