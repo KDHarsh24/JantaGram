@@ -322,26 +322,6 @@ Widget build(BuildContext context) {
           ),
         ],
       ),
-
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Colors.white,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddPostScreen(
-                onPostAdded: (Map<String, dynamic> postData) {
-                  _addNewPost(PostCardModel.fromJson(postData));
-                },
-                email: widget.email,
-              ),
-            ),
-          );
-        },
-        elevation: 4,
-        child: const Icon(Icons.add_a_photo),
-      ),
       bottomNavigationBar: BottomNavBar(currentIndex: 0, email: widget.email),
     ),
   );

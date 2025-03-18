@@ -26,13 +26,14 @@ class JantaGram extends StatelessWidget {
       // ✅ Define Routes
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(email: 'harshkumardas24@gmail.com'),
+        '/': (context) => const HomeScreen(email: ''),
+        '/hdept': (context) => const HomeScreen(email: ''),
         '/inprog':
-            (context) => const InProgress(email: 'harshkumardas24@gmail.com'),
+            (context) => const InProgress(email: ''),
         '/solved':
-            (context) => const Solved(email: 'harshkumardas24@gmail.com'),
+            (context) => const Solved(email: ''),
         '/profile':
-            (context) => UserProfileScreen(email: 'harshkumardas24@gmail.com'),
+            (context) => UserProfileScreen(email: ''),
         '/login': (context) => LoginPage(),
       },
     );
