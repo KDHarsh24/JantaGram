@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/bottom_navbar.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key});
+  String email;
+  LeaderboardScreen({super.key, required this.email});
 
   @override
   State<LeaderboardScreen> createState() => _LeaderboardScreenState();
@@ -275,7 +276,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+      bottomNavigationBar: BottomNavBar(currentIndex: 2, email: widget.email),
     );
   }
 

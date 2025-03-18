@@ -1,5 +1,5 @@
 class Config {
-  static const String baseUrl = 'http://192.168.29.97:5000';
+  static const String baseUrl = 'https://jantagram-production.up.railway.app';
   static const String emailUrl = 'https://azure-jackal-487135.hostingersite.com';
   static String sendOtpUrl = '$baseUrl/send-otp';
   static String verifyOtpUrl = '$baseUrl/verify-otp';

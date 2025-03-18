@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/bottom_navbar.dart'; // ✅ Import BottomNavBar
 
 class UserProfileScreen extends StatelessWidget {
-  UserProfileScreen({super.key});
+  String email;
+  UserProfileScreen({super.key, required this.email});
 
   // Mock User Data
   final String userName = "Chirag Goyal";
@@ -256,7 +257,7 @@ class UserProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 4), // ✅ Use BottomNavBar
+      bottomNavigationBar: BottomNavBar(currentIndex: 4, email: email), // ✅ Use BottomNavBar
     );
   }
 

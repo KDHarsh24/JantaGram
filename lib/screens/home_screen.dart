@@ -220,128 +220,133 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: _showElevation ? 2 : 0,
-          titleSpacing: 0,
-          automaticallyImplyLeading: false,
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Left buttons (User Profile & Leaderboard)
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.account_circle, color: Colors.black87, size: 26),
-                      splashRadius: 24,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => UserProfileScreen()),
-                        );
-                      },
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: _showElevation ? 2 : 0,
+        titleSpacing: 0,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Left buttons (User Profile & Leaderboard)
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.account_circle, color: Colors.black87, size: 26),
+                    splashRadius: 24,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => UserProfileScreen(email: widget.email,)),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.leaderboard, color: Colors.black87, size: 24),
+                    splashRadius: 24,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LeaderboardScreen(email: widget.email,)),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              // Right logo
+              Row(
+                children: [
+                  Icon(Icons.camera_alt, color: theme.colorScheme.primary, size: 24),
+                  const SizedBox(width: 6),
+                  Text(
+                    'CityGram',
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.leaderboard, color: Colors.black87, size: 24),
-                      splashRadius: 24,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LeaderboardScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                // Right logo
-                Row(
-                  children: [
-                    Icon(Icons.camera_alt, color: theme.colorScheme.primary, size: 24),
-                    const SizedBox(width: 6),
-                    Text(
-                      'CityGram', 
-                      style: TextStyle(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      )
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: "Local Feed"),
-              Tab(text: "Nation"),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+              ),
             ],
-            labelColor: theme.colorScheme.primary,
-            unselectedLabelColor: Colors.black54,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            indicatorColor: theme.colorScheme.primary,
-            indicatorWeight: 3,
           ),
         ),
-        body: TabBarView(
+        bottom: TabBar(
           controller: _tabController,
-          children: [
-            // Local Feed Tab
-            CustomScrollView(
+          tabs: const [
+            Tab(text: "Local Feed"),
+            Tab(text: "Nation"),
+          ],
+          labelColor: theme.colorScheme.primary,
+          unselectedLabelColor: Colors.black54,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          indicatorColor: theme.colorScheme.primary,
+          indicatorWeight: 3,
+        ),
+      ),
+
+      // ✅ TabBarView wrapped with RefreshIndicator for pull-to-refresh
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // ✅ Local Feed Tab with Pull-to-Refresh
+          RefreshIndicator(
+            onRefresh: _fetchFeed, // ✅ Pulling down refreshes posts
+            child: CustomScrollView(
               controller: _scrollController,
               slivers: [
-                // City Selector
-                SliverToBoxAdapter(
-                  child: _buildCitySelector(),
-                ),
-                // Feed filtered by selected city and status
-                _buildFeedList(
-                  _posts.where((post) => post.city == _selectedCity && post.status == "unsolved").toList()
-                ),
+                SliverToBoxAdapter(child: _buildCitySelector()), // City selector
+                _buildFeedList(_posts.where((post) => post.city == _selectedCity && post.status == "unsolved").toList()),
               ],
             ),
-            
-            // Nation Feed Tab (all posts)
-            CustomScrollView(
+          ),
+
+          // ✅ Nation Feed Tab with Pull-to-Refresh
+          RefreshIndicator(
+            onRefresh: _fetchFeed,
+            child: CustomScrollView(
               controller: _scrollController,
               slivers: [
                 _buildFeedList(_posts),
               ],
             ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: Colors.white,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddPostScreen(
-                  onPostAdded: (Map<String, dynamic> postData) {
-                    _addNewPost(PostCardModel.fromJson(postData));
-                  }, email: widget.email,
-                ),
-              ),
-            );
-          },
-          elevation: 4,
-          child: const Icon(Icons.add_a_photo),
-        ),
-        bottomNavigationBar: const BottomNavBar(currentIndex: 0),
+          ),
+        ],
       ),
-    );
-  }
+
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: Colors.white,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddPostScreen(
+                onPostAdded: (Map<String, dynamic> postData) {
+                  _addNewPost(PostCardModel.fromJson(postData));
+                },
+                email: widget.email,
+              ),
+            ),
+          );
+        },
+        elevation: 4,
+        child: const Icon(Icons.add_a_photo),
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0, email: widget.email),
+    ),
+  );
+}
+
 
   Widget _buildCitySelector() {
     return Container(

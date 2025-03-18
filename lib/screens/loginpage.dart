@@ -247,11 +247,23 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           children: [
             const SizedBox(height: 45),
             
-            Image.asset(
-              "assets/rasoda-logo.png",
-              height: 100,
-              fit: BoxFit.contain,
-            ),
+            Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.location_on, color: Colors.deepPurple, size: 28), // ✅ Location icon
+              const SizedBox(width: 6),
+              Text(
+                "CityGram",
+                style: TextStyle(
+                  fontSize: 32, // ✅ Large beautiful font size
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins', // ✅ Make sure this font is added in pubspec.yaml
+                  color: Colors.deepPurple, // ✅ Stylish color
+                  letterSpacing: 1.5, // ✅ Slight spacing for elegance
+                ),
+              ),
+            ],
+          ),
             
             const SizedBox(height: 40),
             

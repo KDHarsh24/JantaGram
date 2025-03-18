@@ -169,10 +169,10 @@ Widget _loadImage(Uint8List? photoBlob) {
     borderRadius: BorderRadius.circular(8), // Optional rounded corners
     child: Image.memory(
                 photoBlob, // ✅ Display from blob
-                            width: double.infinity,
-                            height: 250,
-                            fit: BoxFit.cover, // Cover fit
-                          ),
+                width: double.infinity,
+                height: 250,
+                fit: BoxFit.cover, // Cover fit
+        ),
   );
 }
 

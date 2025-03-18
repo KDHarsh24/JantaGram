@@ -8,8 +8,8 @@ import '../screens/leaderboard_screen.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
-
-  const BottomNavBar({Key? key, required this.currentIndex}) : super(key: key);
+  String email;
+  BottomNavBar({Key? key, required this.currentIndex, required this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class BottomNavBar extends StatelessWidget {
           case 2:
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
+              MaterialPageRoute(builder: (context) => LeaderboardScreen(email: email,)),
             );
             break;
           case 3:
@@ -51,7 +51,7 @@ class BottomNavBar extends StatelessWidget {
           case 4:
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => UserProfileScreen()),
+              MaterialPageRoute(builder: (context) => UserProfileScreen(email: email)),
             );
             break;
         }
