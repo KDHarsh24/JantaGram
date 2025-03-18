@@ -30,24 +30,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   List<String> _cities = [];
   bool isLoading = false;
   late Map<String, dynamic> postFetchfeed = {};
+  
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    //Calling A.P.I from
-    loadFromJsonCities('assets/cities.json').then((posts) {
-      setState(() {
-        _cities = posts;
-      });
-      });
-    loadFromJson('assets/posts.json').then((posts) {
-      setState(() {
-        _posts = posts;
-      });
+void initState() {
+  super.initState();
+  _tabController = TabController(length: 2, vsync: this);
+
+  loadFromJsonCities('assets/cities.json').then((cities) {
+    setState(() {
+      _cities = cities;
+      if (!_cities.contains(_selectedCity)) {
+        _selectedCity = _cities.isNotEmpty ? _cities.first : "Unknown City";
+      }
     });
-    _fetchFeed();
-    //Listen to scroll events to show/hide elevation
-  }
+
+    print('🟣 Available cities: $_cities'); // Debug available cities
+  });
+
+  _fetchFeed();
+}
 
   @override
   void dispose() {
@@ -55,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _scrollController.dispose();
     super.dispose();
   }
+
   Future<void> _fetchFeed() async {
   try {
     setState(() {
@@ -62,6 +64,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
 
     final String url = '${Config.baseUrl}/post/feed';
+
+    print('🟡 Selected City: $_selectedCity'); // Debug selected city
 
     final response = await http.post(
       Uri.parse(url),
@@ -71,20 +75,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       },
       body: json.encode({"email": widget.email}),
     ).timeout(
-      const Duration(seconds: 15),
+      const Duration(seconds: 30), // ✅ Increased timeout
       onTimeout: () {
-        throw TimeoutException('Request timed out');
+        print('❌ API Request Timeout after 15 seconds');
+        throw TimeoutException('Request timed out!');
       },
     );
 
-    // Log response
-    //print(response.body);
     if (response.body.isEmpty) {
-      throw Exception('Empty response received from server');
+      throw Exception('❌ Empty response received from server');
     }
 
     final Map<String, dynamic> responseData = json.decode(response.body);
-
 
     if (responseData['data'] == null || responseData['data'] is! List) {
       setState(() {
@@ -96,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No student data available'),
+          content: Text('⚠️ No posts available'),
           backgroundColor: Colors.orange,
         )
       );
@@ -106,7 +108,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     // ✅ Convert JSON array to List<PostCardModel>
     List<PostCardModel> fetchedPosts = (responseData['data'] as List)
         .map((item) => PostCardModel.fromJson(item))
+        .where((post) => post.city != null) // ✅ Remove posts with null city
         .toList();
+
+    print('🟢 Fetched Posts Cities: ${fetchedPosts.map((p) => p.city).toList()}'); // Debug fetched cities
 
     setState(() {
       _posts = fetchedPosts;
@@ -123,12 +128,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Error: ${e.toString()}'),
+        content: Text('❌ Error: ${e.toString()}'),
         backgroundColor: Colors.red,
       )
     );
   }
 }
+
 
   Future<List<PostCardModel>> loadFromJson(String fileName) async {
     try {
@@ -305,7 +311,7 @@ Widget build(BuildContext context) {
               controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(child: _buildCitySelector()), // City selector
-                _buildFeedList(_posts.where((post) => post.city == _selectedCity && post.solved == "unsolved").toList()),
+                _buildFeedList(_posts.where((post) => post.city == _selectedCity).toList()),
               ],
             ),
           ),
@@ -408,56 +414,57 @@ Widget build(BuildContext context) {
   }
 
   Widget _buildFeedList(List<PostCardModel> posts) {
-    return posts.isNotEmpty
-        ? SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => PostCard(
-                post: posts[index],
+  return posts.isNotEmpty
+      ? SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final post = posts[index];
+              print('🔵 Post City: ${post.city}, Selected City: $_selectedCity'); // Debug per post
+
+              return PostCard(
+                post: post,
                 onLikeToggled: _handleUpvote,
                 onShare: (postId) {
                   final post = posts.firstWhere((p) => p.id == postId);
                   _handleShare(post);
-                }, // ✅ Correctly accepts postId and handles it
+                },
                 onAuthorityTap: _handleTagClick,
                 onTap: (postId) {
-                  // Navigate to post detail screen if needed
-                  debugPrint('Post $postId tapped');
+                  debugPrint('📌 Post $postId tapped');
                 },
-              ),
-              childCount: posts.length,
+              );
+            },
+            childCount: posts.length,
+          ),
+        )
+      : SliverFillRemaining(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.post_add, size: 60, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  "⚠️ No posts available for this city!",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Be the first to post an update!",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
             ),
-          )
-        : SliverFillRemaining(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.post_add,
-                    size: 60,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "No posts available for this city!",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Be the first to post an update!",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-    }
+          ),
+        );
+}
+
 }
 // You'll need to update this class as well to work with PostCardModel

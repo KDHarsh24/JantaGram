@@ -199,7 +199,7 @@ class _AddPostDeptScreenState extends State<AddPostDeptScreen> with SingleTicker
         "timestamp": DateTime.now().toIso8601String(),
         "isLikedByUser": false,
         "email": widget.email,
-        "status": _selectedStatus, // ✅ Include status in the data payload
+        "solved": _selectedStatus, // ✅ Include status in the data payload
       };
       final String url = '${Config.baseUrl}/posts/create';
 
