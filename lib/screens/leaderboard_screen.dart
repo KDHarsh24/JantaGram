@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../widgets/bottom_navbar.dart';
+import '../config.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   String email;
@@ -10,15 +14,12 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
-  // Selected time period filter
-  String _selectedPeriod = "all_time";
 
   // Track if data is loading
-  bool _isLoading = false;
+  bool isLoading = false;
 
   // Mock leaderboard data for different time periods
-  final Map<String, List<Map<String, dynamic>>> _leaderboardData = {
-    "all_time": [
+  List<Map<String, dynamic>> _leaderboardData = [
       {"name": "Chirag Goyal", "points": 1500, "profilePic": "https://via.placeholder.com/150", "badge": "Super Contributor", "id": "user1"},
       {"name": "Aditi Sharma", "points": 1400, "profilePic": "https://via.placeholder.com/150", "badge": "Active Member", "id": "user2"},
       {"name": "Rahul Verma", "points": 1300, "profilePic": "https://via.placeholder.com/150", "badge": "Rising Star", "id": "user3"},
@@ -27,54 +28,67 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       {"name": "Sanya Mehta", "points": 1000, "profilePic": "https://via.placeholder.com/150", "badge": "Consistent", "id": "user6"},
       {"name": "Rohan Das", "points": 900, "profilePic": "https://via.placeholder.com/150", "badge": "Helpful", "id": "user7"},
       {"name": "Meera Kapoor", "points": 850, "profilePic": "https://via.placeholder.com/150", "badge": "New Member", "id": "user8"},
-    ],
-    "this_month": [
-      {"name": "Aditi Sharma", "points": 742, "profilePic": "https://via.placeholder.com/150", "badge": "Active Member", "id": "user2"},
-      {"name": "Chirag Goyal", "points": 725, "profilePic": "https://via.placeholder.com/150", "badge": "Super Contributor", "id": "user1"},
-      {"name": "Neha Singh", "points": 682, "profilePic": "https://via.placeholder.com/150", "badge": "Verified Local", "id": "user4"},
-      {"name": "Rahul Verma", "points": 610, "profilePic": "https://via.placeholder.com/150", "badge": "Rising Star", "id": "user3"},
-      {"name": "Rohan Das", "points": 585, "profilePic": "https://via.placeholder.com/150", "badge": "Helpful", "id": "user7"},
-      {"name": "Karan Patel", "points": 520, "profilePic": "https://via.placeholder.com/150", "badge": "Top Reporter", "id": "user5"},
-      {"name": "Sanya Mehta", "points": 465, "profilePic": "https://via.placeholder.com/150", "badge": "Consistent", "id": "user6"},
-      {"name": "Meera Kapoor", "points": 410, "profilePic": "https://via.placeholder.com/150", "badge": "New Member", "id": "user8"},
-    ],
-    "this_week": [
-      {"name": "Rahul Verma", "points": 320, "profilePic": "https://via.placeholder.com/150", "badge": "Rising Star", "id": "user3"},
-      {"name": "Neha Singh", "points": 280, "profilePic": "https://via.placeholder.com/150", "badge": "Verified Local", "id": "user4"},
-      {"name": "Aditi Sharma", "points": 260, "profilePic": "https://via.placeholder.com/150", "badge": "Active Member", "id": "user2"},
-      {"name": "Chirag Goyal", "points": 230, "profilePic": "https://via.placeholder.com/150", "badge": "Super Contributor", "id": "user1"},
-      {"name": "Meera Kapoor", "points": 195, "profilePic": "https://via.placeholder.com/150", "badge": "New Member", "id": "user8"},
-      {"name": "Rohan Das", "points": 180, "profilePic": "https://via.placeholder.com/150", "badge": "Helpful", "id": "user7"},
-      {"name": "Karan Patel", "points": 165, "profilePic": "https://via.placeholder.com/150", "badge": "Top Reporter", "id": "user5"},
-      {"name": "Sanya Mehta", "points": 130, "profilePic": "https://via.placeholder.com/150", "badge": "Consistent", "id": "user6"},
-    ],
-  };
+    ];
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchLeaderboard(); // Fetch data on screen load
+  }
   // Fetch leaderboard data
-  Future<void> _fetchLeaderboardData(String period) async {
-    // In a real app, this would be an API call
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _fetchLeaderboard() async {
+    try {
+      final String url = '${Config.baseUrl}/user/leaderboard'; // ✅ Backend API URL
 
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 600));
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Accept": "application/json"},
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception("Request timed out"),
+      );
+
+      if (response.statusCode == 201) {
+        List<dynamic> responseData = json.decode(response.body)['data'];
+        print(responseData);
+        setState(() {
+          _leaderboardData = responseData.map<Map<String, dynamic>>((item) {
+            return {
+              "name": item["name"],
+              "points": item["points"],
+              "profilePic": "https://via.placeholder.com/150", // ✅ Placeholder image
+              "badge": "", // ✅ Default badge (optional, can be empty)
+              "id": item["_id"] ?? "",
+            };
+          }).toList();
+
+          isLoading = false; // ✅ Stop loading
+        });
+      } else {
+        throw Exception("Failed to fetch leaderboard");
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
 
     // This is where you would make the actual API call
     // Example:
     // final response = await http.get(Uri.parse('$apiBaseUrl/leaderboard?period=$period'));
     // final data = jsonDecode(response.body);
     
-    setState(() {
-      _selectedPeriod = period;
-      _isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     // Get the current leaderboard data based on selected period
-    final currentData = _leaderboardData[_selectedPeriod]!;
+    final currentData = _leaderboardData;
     
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -108,11 +122,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _fetchLeaderboardData(_selectedPeriod),
+            onPressed: () => _fetchLeaderboard(),
           ),
         ],
       ),
-      body: _isLoading
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -164,13 +178,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Row(
-                      children: [
-                        _buildPeriodTab("All Time", "all_time"),
-                        _buildPeriodTab("This Month", "this_month"),
-                        _buildPeriodTab("This Week", "this_week"),
-                      ],
                     ),
                   ),
                 ),
@@ -280,31 +287,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  // Build period tab button
-  Widget _buildPeriodTab(String label, String periodValue) {
-    final isSelected = _selectedPeriod == periodValue;
-    
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _fetchLeaderboardData(periodValue),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.blue[700] : Colors.transparent,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   // Widget to show Top 3 Users with Trophies 🏆
   Widget _buildTopThree(List<Map<String, dynamic>> data) {

@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', email);
         await prefs.setString('sessionCookies', _cookieHeader);
-        
+        print(email);
         switch (responseData['isNewUser']) {
           case true:
             Navigator.pushReplacement(

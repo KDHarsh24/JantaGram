@@ -22,7 +22,7 @@ class JantaGram extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ✅ Define Routes
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(email: 'harshkumardas24@gmail.com'),
         '/profile': (context) => UserProfileScreen(email: 'harshkumardas24@gmail.com'),

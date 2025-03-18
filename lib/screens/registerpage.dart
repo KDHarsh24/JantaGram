@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import '../Config.dart'; // Your API URLs
+import '../Config.dart';
+import 'home_screen.dart'; // Your API URLs
 
 class RegisterPage extends StatefulWidget {
   final String email; // Email passed from login page
@@ -92,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('${Config.baseUrl}/register'),
+        Uri.parse('${Config.baseUrl}/user/register'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': widget.email,
@@ -104,17 +105,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
       final responseData = json.decode(response.body);
 
-      if (response.statusCode == 200 && responseData['success'] == true) {
-        // Registration successful
+      if (response.statusCode == 201) {
+  // Registration successful
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Account created successfully!'),
+          const SnackBar(
+            content: Text('Account created successfully!'),
             backgroundColor: Colors.green,
           ),
         );
-        // Navigate back or home
-        Navigator.pop(context); // or go to HomePage()
-      } else {
+
+        // ✅ Navigate to HomeScreen or another page after a short delay
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen(email: widget.email)),
+          );
+        });
+      }
+       else {
         setState(() {
           errorMessage = responseData['message'] ?? 'Failed to register.';
         });
