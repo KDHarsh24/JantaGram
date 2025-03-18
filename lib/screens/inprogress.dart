@@ -11,16 +11,16 @@ import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import '../config.dart';
 
-class HomeScreen extends StatefulWidget {
+class InProgress extends StatefulWidget {
   final String email;
   
-  const HomeScreen({Key ? key, required this.email}): super(key: key);
+  const InProgress({Key ? key, required this.email}): super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<InProgress> createState() => _InProgressState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _InProgressState extends State<InProgress> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
   final bool _showElevation = false;
@@ -305,7 +305,7 @@ Widget build(BuildContext context) {
               controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(child: _buildCitySelector()), // City selector
-                _buildFeedList(_posts.where((post) => post.city == _selectedCity && post.solved == "unsolved").toList()),
+                _buildFeedList(_posts.where((post) => post.city == _selectedCity && post.solved == "inprogress").toList()),
               ],
             ),
           ),
