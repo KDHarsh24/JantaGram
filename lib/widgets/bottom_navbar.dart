@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart'; 
 import '../screens/user_profile_screen.dart'; 
 import '../screens/leaderboard_screen.dart'; 
-// import '../screens/in_progress_screen.dart'; 
-// import '../screens/solved_screen.dart';
+import '../screens/inprogress.dart'; 
+import '../screens/solved.dart';
 // TODO: Import other screens if needed
 
 class BottomNavBar extends StatelessWidget {
@@ -31,23 +31,25 @@ class BottomNavBar extends StatelessWidget {
             );
             break;
           case 1:
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const InProgressScreen()),
-            // );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const InProgress(email: 'harshkumardas24@gmail.com')),
+            );
             break;
-          case 2:
+            case 2:
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Solved(email: 'harshkumardas24@gmail.com',)),
+            );
+            break;
+          case 3:
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => LeaderboardScreen(email: email,)),
             );
             break;
-          case 3:
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const SolvedScreen()),
-            // );
-            break;
+          
+
           case 4:
             Navigator.pushReplacement(
               context,
@@ -66,12 +68,12 @@ class BottomNavBar extends StatelessWidget {
           label: "In Progress",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.leaderboard),
-          label: "Leaderboard",
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.check_circle),
           label: "Solved",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.leaderboard),
+          label: "Leaderboard",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

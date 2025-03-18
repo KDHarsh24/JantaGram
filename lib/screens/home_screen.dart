@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       },
       body: json.encode({"email": widget.email}),
     ).timeout(
-      const Duration(seconds: 10),
+      const Duration(seconds: 15),
       onTimeout: () {
         throw TimeoutException('Request timed out');
       },

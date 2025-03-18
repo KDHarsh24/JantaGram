@@ -24,7 +24,7 @@ class JantaGram extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ✅ Define Routes
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
         '/': (context) => const HomeScreen(email: ''),
         '/hdept': (context) => const HomeScreen(email: ''),

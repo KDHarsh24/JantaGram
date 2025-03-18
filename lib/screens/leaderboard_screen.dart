@@ -20,14 +20,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   // Mock leaderboard data for different time periods
   List<Map<String, dynamic>> _leaderboardData = [
-      {"name": "Chirag Goyal", "points": 1500, "profilePic": "https://via.placeholder.com/150", "badge": "Super Contributor", "id": "user1"},
-      {"name": "Aditi Sharma", "points": 1400, "profilePic": "https://via.placeholder.com/150", "badge": "Active Member", "id": "user2"},
-      {"name": "Rahul Verma", "points": 1300, "profilePic": "https://via.placeholder.com/150", "badge": "Rising Star", "id": "user3"},
-      {"name": "Neha Singh", "points": 1200, "profilePic": "https://via.placeholder.com/150", "badge": "Verified Local", "id": "user4"},
-      {"name": "Karan Patel", "points": 1100, "profilePic": "https://via.placeholder.com/150", "badge": "Top Reporter", "id": "user5"},
-      {"name": "Sanya Mehta", "points": 1000, "profilePic": "https://via.placeholder.com/150", "badge": "Consistent", "id": "user6"},
-      {"name": "Rohan Das", "points": 900, "profilePic": "https://via.placeholder.com/150", "badge": "Helpful", "id": "user7"},
-      {"name": "Meera Kapoor", "points": 850, "profilePic": "https://via.placeholder.com/150", "badge": "New Member", "id": "user8"},
     ];
 
   @override
@@ -56,7 +48,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             return {
               "name": item["name"],
               "points": item["points"],
-              "profilePic": "https://via.placeholder.com/150", // ✅ Placeholder image
+              "profilePic": "https://th.bing.com/th/id/OIP.Z8d1mi6B_6j2JbElEPl-QQHaHa?rs=1&pid=ImgDetMain", // ✅ Placeholder image
               "badge": "", // ✅ Default badge (optional, can be empty)
               "id": item["_id"] ?? "",
             };

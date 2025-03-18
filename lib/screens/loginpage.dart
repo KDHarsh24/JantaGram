@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config.dart';
 import 'registerpage.dart';
 import 'home_screen.dart';
+import 'home_screen_dept.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -155,6 +156,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         await prefs.setString('email', email);
         await prefs.setString('sessionCookies', _cookieHeader);
         print(email);
+        if (responseData['depart'] == "d"){
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreenDept(email: email)),
+            );
+        }
+        else{
         switch (responseData['isNewUser']) {
           case true:
             Navigator.pushReplacement(
@@ -169,6 +177,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 builder: (context) => HomeScreen(email: email),
               ),
             );
+        }
         }
       } else {
         setState(() => _isOtpError = true);
